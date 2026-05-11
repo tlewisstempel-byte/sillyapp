@@ -8,11 +8,11 @@ const againButton = document.querySelector("#again");
 const resetButton = document.querySelector("#reset");
 
 const messages = [
-  "ella is extremely silly, hi T",
-  "ella is really, really silly",
-  "T is better than ella",
+  "ella is a nonce, hi T",
+  "ella is a total nonce also hi T",
+  "ella stop stalking paddy you freak",
   "hi T",
-  "ella ffs why are you here",
+  "ella ffs why are you here can you just leave",
 ];
 
 const board = {
