@@ -8,11 +8,11 @@ const againButton = document.querySelector("#again");
 const resetButton = document.querySelector("#reset");
 
 const messages = [
-  "ella is a nonce, hi T",
-  "ella is a total nonce also hi T",
-  "ella stop stalking paddy you freak",
+  "ella is extremely silly, hi T",
+  "ella is really, really silly",
+  "T is better than ella",
   "hi T",
-  "ella ffs why are you here can you just leave",
+  "ella ffs why are you here",
 ];
 
 const board = {
@@ -27,6 +27,7 @@ let player;
 let wins = 0;
 let messageIndex = 0;
 let lastTime = 0;
+let audioContext;
 
 const lanes = [
   { row: 1, color: "#14203a", speed: -42, cars: [{ x: 70, w: 112 }, { x: 400, w: 130 }] },
@@ -42,8 +43,39 @@ function resetRun() {
     row: 7,
     pop: 0,
     bumped: 0,
+    frozenUntil: 0,
   };
-  prizeEl.textContent = "A smug little win screen.";
+  prizeEl.textContent = "A lovely little message";
+}
+
+function playTone(frequency, start, duration, gain, type = "sine") {
+  if (!audioContext) return;
+
+  const oscillator = audioContext.createOscillator();
+  const volume = audioContext.createGain();
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, start);
+  volume.gain.setValueAtTime(0.0001, start);
+  volume.gain.exponentialRampToValueAtTime(gain, start + 0.025);
+  volume.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+  oscillator.connect(volume);
+  volume.connect(audioContext.destination);
+  oscillator.start(start);
+  oscillator.stop(start + duration + 0.03);
+}
+
+function playWinSound() {
+  const AudioEngine = window.AudioContext || window.webkitAudioContext;
+  if (!AudioEngine) return;
+
+  audioContext ||= new AudioEngine();
+  if (audioContext.state === "suspended") audioContext.resume();
+
+  const now = audioContext.currentTime;
+  playTone(523.25, now, 0.16, 0.08, "triangle");
+  playTone(659.25, now + 0.11, 0.18, 0.08, "triangle");
+  playTone(783.99, now + 0.23, 0.22, 0.09, "triangle");
+  playTone(1046.5, now + 0.38, 0.34, 0.07, "sine");
 }
 
 function drawRoundedRect(x, y, width, height, radius) {
@@ -139,6 +171,7 @@ function drawPlayer(time) {
   const center = tileCenter(player.col, player.row);
   const bounce = Math.sin(time / 130) * 2 + player.pop * 7;
   const squash = player.bumped > 0 ? 1.1 : 1;
+  const isFrozen = Date.now() < player.frozenUntil;
 
   ctx.save();
   ctx.translate(center.x, center.y - bounce);
@@ -162,6 +195,15 @@ function drawPlayer(time) {
   ctx.arc(-10, -3, 4, 0, Math.PI * 2);
   ctx.arc(12, -3, 4, 0, Math.PI * 2);
   ctx.fill();
+
+  if (isFrozen) {
+    ctx.strokeStyle = "rgba(200, 255, 255, 0.82)";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(0, 0, 43, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
   ctx.restore();
 }
 
@@ -174,7 +216,8 @@ function detectCollision() {
 
   if (hit) {
     player.bumped = 8;
-    prizeEl.textContent = "Bumped. Still winning, obviously.";
+    player.frozenUntil = Date.now() + 620;
+    prizeEl.textContent = "Frozen for a beat. Still winning, obviously.";
   }
 }
 
@@ -185,11 +228,13 @@ function win() {
   winsEl.textContent = String(wins);
   prizeEl.textContent = message;
   winMessageEl.textContent = message;
+  playWinSound();
   dialog.showModal();
 }
 
 function move(direction) {
   if (dialog.open) return;
+  if (Date.now() < player.frozenUntil) return;
 
   if (direction === "up") player.row = Math.max(0, player.row - 1);
   if (direction === "down") player.row = Math.min(7, player.row + 1);
