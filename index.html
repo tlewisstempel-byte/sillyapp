@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sillyapp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell" aria-label="Sillyapp game">
+      <section class="game-card">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Glossy tiny arcade</p>
+            <h1>Sillyapp</h1>
+          </div>
+          <div class="score-pill" aria-live="polite">
+            <span>Wins</span>
+            <strong id="wins">0</strong>
+          </div>
+        </header>
+
+        <div class="stage-wrap">
+          <canvas id="game" width="720" height="840" aria-label="Lane crossing game board"></canvas>
+          <div class="shine"></div>
+        </div>
+
+        <div class="controls" aria-label="Movement controls">
+          <button class="control control-up" data-move="up" aria-label="Move up">▲</button>
+          <button class="control" data-move="left" aria-label="Move left">◀</button>
+          <button class="control" data-move="down" aria-label="Move down">▼</button>
+          <button class="control" data-move="right" aria-label="Move right">▶</button>
+        </div>
+      </section>
+
+      <aside class="side-panel" aria-label="Game status">
+        <div class="mini-orbit">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <p class="status-label">Current prize</p>
+        <p id="prize" class="status-text">A smug little win screen.</p>
+        <button id="reset" class="primary-button" type="button">Restart run</button>
+      </aside>
+    </main>
+
+    <dialog id="winDialog" class="win-dialog">
+      <form method="dialog">
+        <p class="win-kicker">Victory</p>
+        <h2 id="winMessage">hi T</h2>
+        <button id="again" class="primary-button" value="again">Win again</button>
+      </form>
+    </dialog>
+
+    <script src="game.js"></script>
+  </body>
+</html>
